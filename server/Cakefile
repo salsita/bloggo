@@ -1,0 +1,55 @@
+# # Command Line Interface
+
+# Readable command line output is just as important as readable documentation!  It is the first
+# interaction that a developer will have with a tool like this, so we want to leave a good
+# impression with nicely formatted and readable command line output.
+
+path      = require 'path'
+{
+  stream
+, runTestForSpec
+, runIntegrationTest
+, getFiles
+, pathDelimiter
+, preprocessFiles
+, compileFiles
+}         = require './utils/cake'
+config    = require 'config'
+
+
+# Absolute path to the project root directory.
+APP_ROOT = path.resolve(__dirname + '/..')
+
+SERVER_ROOT = path.join APP_ROOT, 'server'
+LOG_DIR = process.env.LOG_DIR or path.join(SERVER_ROOT, '..')
+
+# The main module for the server.
+SERVER_MODULE = 'app.coffee'
+
+# Testing.
+UNIT_TEST_ROOT = path.join SERVER_ROOT, 'test', 'unit'
+
+COFFEE_BINARY = 'coffee'
+
+task 'start', 'Start the server.', (options) ->
+  stream 'coffee', ['./utils/run_dev_server.coffee']
+
+option '-n', '--no-rebuild', 'Do not preprocess or compile CS files'
+
+task 'docs', 'Generate docs', ->
+  stream path.join(SERVER_ROOT, 'node_modules', '.bin', 'groc')
+
+option '-g', '--grep [pattern]', 'what test specs to run'
+option '-R', '--test-reporter [reporter]', 'choose mocha reporter'
+
+task 'test', 'Run mocha specs', (options) ->
+  grep = if options.grep then options.grep else '.*'
+  reporter = options['test-reporter'] or 'spec'
+  specs = getFiles('./**/*.spec.coffee').join ' '
+  console.log 'specs', specs
+  stream './node_modules/.bin/mocha', [
+    '--recursive', '--colors'
+    , '--compilers', 'coffee:coffee-script'
+    , '-R', "#{reporter}"
+    , '-g', "#{grep}"
+    , "#{specs}"], process.exit

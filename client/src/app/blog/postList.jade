@@ -1,0 +1,9 @@
+.post-list-container
+  .post-list(ng-repeat='post in posts')
+     .post
+       h1.title
+         a(ng-click='postSelected(post.slug)')
+           | {{post.title}}
+       span.date
+         | &nbsp;{{post.date | date: 'MMM d yyyy'}}
+       .preview(ng-bind-html-unsafe="post.preview", blog-post-preview, read-more-selected="postSelected(post.slug)")
