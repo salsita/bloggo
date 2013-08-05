@@ -77,15 +77,12 @@ app.listen app.get('port'), ->
   + "in #{app.settings.env} mode"
 
 
+app.use '/api', require('./poet')
+
 app.get '/', require('./routes').setup(app)
 
-require('./poet').setup app
 
-app.get '/*', (req, res) ->
-  console.log 'default route', req.path
-  newUrl = req.protocol + '://' + req.get('Host') + '/#' + req.url
-  console.log 'new url', newUrl
-
-  res.redirect newUrl
-    #res.sendfile path.join(config.server.static_root, 'index.html')
+app.use (req, res) ->
+  console.log('default route', req.path)
+  res.sendfile path.join(config.server.static_root, 'index.html')
 

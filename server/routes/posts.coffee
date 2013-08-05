@@ -1,8 +1,15 @@
+_ = require 'underscore'
+
 exports.setup = (poet) ->
 
   index: (req, res) ->
-    posts = poet.helpers.getPosts()
-    res.json posts
+    if req.query.tags
+      tags = JSON.parse req.query.tags
+      return res.json _.reduce tags, (list, tag) ->
+        _.union list, poet.helpers.postsWithTag tag
+      , []
+
+    res.json poet.helpers.getPosts()
 
   show: (req, res) ->
     post = poet.helpers.getPost req.params.post
