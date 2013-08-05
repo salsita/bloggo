@@ -3,3 +3,6 @@ div.post
     a(href="{{url}}") {{data.title}}
   span.date {{data.date | date: 'MMM d yyyy'}}
   .post.content(ng-bind-html-unsafe="data.content")
+
+.back
+  a.btn(ng-click='showAll()') Back to all posts

@@ -26,42 +26,41 @@ angular.module('salsitasoft.blog', [
 
   posts = postsRes.query()
 
-  {
+  return {
     getPosts: -> posts
     getPost: (postId) -> _.findWhere posts, slug: postId
+    getPostsForTag: (tag) -> postsRes.query tags: JSON.stringify [tag]
   }
 
 
 .controller 'BlogCtrl', ($scope, $state, Blog) ->
-  console.log 'blog ctrl'
   $scope.posts = Blog.getPosts()
+
   $scope.postSelected = (slug) ->
-    console.log 'selected post', slug
     $state.transitionTo 'postDetail', {postId: slug}
 
+  $scope.tagSelected = (tag) ->
+    $scope.posts = Blog.getPostsForTag tag
 
 
-.controller 'PostCtrl', ($scope, Blog, $stateParams) ->
-  console.log 'post ctrl', $stateParams.postId
+.controller 'PostCtrl', ($scope, Blog, $stateParams, $state) ->
   $scope.data = $scope.$watch ->
     Blog.getPost($stateParams.postId)
   , (newVal) ->
     $scope.data = newVal
   , true
 
+  $scope.showAll = ->
+    $state.transitionTo 'postList'
+
 
 .directive 'blogPostPreview', ($compile, $parse) ->
-  restrict: 'A'
+  restrict: 'EA'
   link: (scope, element, attrs) ->
-    unregister = scope.$watch ->
-      $(element).find('a.read-more').length
+    previewHTML = $parse(attrs.previewContent)(scope)
+    $(element).append $compile(previewHTML)(scope)
 
-    , (present) ->
-      return unless present
-      # Notify parent controller when user clicks the 'read more' link.
-      $(element).find('a.read-more').on 'click', ->
-        scope.$apply ->
-          $parse(attrs.readMoreSelected)(scope)
-
-      # Click eent hander is set. We can remove the watcher now.
-      unregister()
+    # Notify parent controller when user clicks the 'read more' link.
+    $(element).find('a.read-more').on 'click', ->
+      scope.$apply ->
+        $parse(attrs.onReadMoreClicked)(scope)
