@@ -1,6 +1,7 @@
 ---
 title: "Markdown Syntax Doc"
 tags: ["blog", "test", "foobar", "markdown"]
+category: "markdown"
 date: "11-8-2013"
 ---
 
