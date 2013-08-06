@@ -11,12 +11,34 @@ angular.module( 'salsitasoft', [
   'salsitasoft.blog',
   'ui.state',
   'ui.route',
-  'ngSanitize'
+  'ngSanitize',
+
+  'restangular'
 ])
 
 .config( function ($urlRouterProvider, $locationProvider) {
   $urlRouterProvider.otherwise('/posts');
   $locationProvider.html5Mode(true).hashPrefix('#');
+})
+
+.config( function (RestangularProvider) {
+
+    // Now let's configure the response extractor for each request
+    RestangularProvider.setResponseExtractor(function(response, operation, what, url) {
+      // This is a get for a list
+      var newResponse;
+      if (operation === "getList") {
+        // Here we're returning an Array which has one special property metadata with our extra information
+        newResponse = response.data.data;
+        newResponse.metadata = response.data.meta;
+      } else {
+        // This is an element
+        newResponse = response;
+      }
+      return newResponse;
+    });
+
+    RestangularProvider.setBaseUrl("/api");
 })
 
 .run( function ( titleService, $rootScope ) {

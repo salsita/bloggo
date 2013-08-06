@@ -60,7 +60,9 @@ module.exports = {
       'vendor/angular-ui-router/release/angular-ui-router.js',
       'vendor/angular-ui-utils/modules/route/route.js',
       'vendor/underscore/underscore.js',
-      'vendor/moment/moment.js'
+      'vendor/moment/moment.js',
+      'vendor/nginfinitescroll/build/ng-infinite-scroll.js',
+      'vendor/restangular/dist/restangular.js'
     ],
     css: [
     ]

@@ -15,7 +15,7 @@ poet = Poet app,
   metaFormat: 'yaml'
   # Set up the how the 'read more' link in posts will be expanded.
   readMoreLink: (post) -> """
-    <a class="read-more" ng-click="foo" title='Read more of #{post.title}'>
+    <a class="read-more" title='Read more of #{post.title}'>
       Read More
     </a>
     """

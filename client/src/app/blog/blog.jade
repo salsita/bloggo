@@ -1,0 +1,26 @@
+
+.row
+  .col-lg-4
+    .timeline
+      .year(ng-repeat='(year, months) in metadata.stats')
+        {{year}}
+        .month(ng-repeat='(month, post_count) in months track by $index')
+          p &nbsp;{{month | monthIndexToString}} ({{post_count}})
+    ul.selected-tag(ng-repeat='tag in selectedTags')
+      li {{tag}}
+
+  .col-lg-8.post-list-container(infinite-scroll="loadMorePosts()", infinite-scroll-disabled="busy", infinite-scroll-distance='1')
+    .post-list(post-list)
+      .post.well(ng-repeat='post in posts')
+        h1.title
+          a(ng-click='postSelected(post.slug)') {{post.title}}
+
+        span.date
+          | &nbsp;{{post.date | date: 'MMM d yyyy'}}
+
+        .preview(blog-post-preview, preview-content="post.preview", on-read-more-clicked="postSelected(post.slug)")
+
+        hr.fancy-line
+
+        ul.tags(ng-repeat='tag in post.tags')
+          li(class="btn btn-info", ng-click="tagSelected(tag)") {{tag}}
