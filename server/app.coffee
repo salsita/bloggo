@@ -5,7 +5,6 @@
 #
 require 'coffee-script'
 
-ejs = require 'ejs'
 path = require 'path'
 require 'express-resource'
 express = require 'express'
