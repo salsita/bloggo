@@ -42,8 +42,6 @@ app.configure ->
 
   app.use app.router
 
-  # Use ejs renderer to render plain HTML files.
-  app.engine 'html', require('ejs').renderFile
   app.set 'views', config.server.views_root
   app.set 'view engine', 'jade'
 

@@ -11,8 +11,6 @@ path      = require 'path'
 , runIntegrationTest
 , getFiles
 , pathDelimiter
-, preprocessFiles
-, compileFiles
 }         = require './utils/cake'
 config    = require 'config'
 

@@ -7,9 +7,9 @@
     "config": "=0.4.18",
     "jade": "*",
     "coffee-script": "~1.4",
-    "ejs": "=0.8.2",
-    "poet": "~1.0.0rc1",
-    "express-resource": "~1.0.0"
+    "poet": "~1.0.0-rc1",
+    "express-resource": "~1.0.0",
+    "underscore": "~1.5.1"
   },
   "devDependencies": {
     "mocha": "~1.8",
@@ -27,6 +27,7 @@
     "watchr": "=2.3.3",
     "sandboxed-module": "=0.1.4",
     "JSV": "=4.0.2",
-    "supertest": "=0.5.1"
+    "supertest": "=0.5.1",
+    "glob": "~3.2.6"
   }
 }
