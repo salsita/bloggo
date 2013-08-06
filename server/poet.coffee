@@ -37,10 +37,14 @@ app.resource 'posts', require('./routes/posts').setup poet
 
 app.resource 'tags', {
   index: (req, res) ->
-    res.json poet.helpers.getTags()
+    res.json
+      data:
+        data: poet.helpers.getTags()
 }
 
 app.resource 'categories', {
   index: (req, res) ->
-    res.json poet.helpers.getCategories()
+    res.json
+      data:
+        data: poet.helpers.getCategories()
 }

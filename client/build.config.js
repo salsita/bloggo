@@ -62,7 +62,8 @@ module.exports = {
       'vendor/underscore/underscore.js',
       'vendor/moment/moment.js',
       'vendor/nginfinitescroll/build/ng-infinite-scroll.js',
-      'vendor/restangular/dist/restangular.js'
+      'vendor/restangular/dist/restangular.js',
+      'vendor/angular-disqus/angular-disqus.js'
     ],
     css: [
     ]

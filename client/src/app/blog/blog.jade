@@ -1,26 +1,43 @@
 
 .row
   .col-lg-4
-    .timeline
+    .left-menu
       .year(ng-repeat='(year, months) in metadata.stats')
-        {{year}}
+        a(ng-click='filterDate(year)') {{year}}
         .month(ng-repeat='(month, post_count) in months track by $index')
-          p &nbsp;{{month | monthIndexToString}} ({{post_count}})
-    ul.selected-tag(ng-repeat='tag in selectedTags')
-      li {{tag}}
+          a(ng-click='filterDate(year, month)') &nbsp;{{month | monthIndexToString}} ({{post_count}})
 
-  .col-lg-8.post-list-container(infinite-scroll="loadMorePosts()", infinite-scroll-disabled="busy", infinite-scroll-distance='1')
-    .post-list(post-list)
-      .post.well(ng-repeat='post in posts')
-        h1.title
-          a(ng-click='postSelected(post.slug)') {{post.title}}
+      h3 Selected Tags:
+      ul.selected-tag
+        li(ng-repeat='tag in filter.tags') {{tag}}
+      div(ng-show="filter.tags.length === 0")
+        | None
 
-        span.date
-          | &nbsp;{{post.date | date: 'MMM d yyyy'}}
+      h3 Selected Category
+      .selected-category {{filter.category || "None"}}
 
-        .preview(blog-post-preview, preview-content="post.preview", on-read-more-clicked="postSelected(post.slug)")
+      .reset-filters
+        a.btn.btn-info(ng-click='resetFilters()') reset filters
 
-        hr.fancy-line
+  .col-lg-8
+    ul.categories.nav.nav-pills
+      li.category(ng-repeat='category in categories', ng-click="categorySelected(category)", ng-class="{disabled: metadata.categories.indexOf(category) < 0, active: metadata.categories.indexOf(category) > -1}")
+        a {{category}}
 
-        ul.tags(ng-repeat='tag in post.tags')
-          li(class="btn btn-info", ng-click="tagSelected(tag)") {{tag}}
+    hr
+
+    .post-list-container(infinite-scroll="loadMorePosts()", infinite-scroll-disabled="busy", infinite-scroll-distance='1', infinite-scroll-immediate-check='true')
+      .post-list(mark-center-element="active", item-selector=".post", items="posts")
+        .post.well(ng-repeat='post in posts')
+          h1.title
+            a(ng-click='postSelected(post.slug)') {{post.title}}
+
+          span.date
+            | &nbsp;{{post.date | date: 'MMM d yyyy'}}
+
+          .preview(blog-post-preview="post.preview", read-more="postSelected(post.slug)")
+
+          hr.fancy-line
+
+          ul.tags
+            li.btn.btn-info(ng-repeat='tag in post.tags', ng-click="tagSelected(tag)") {{tag}}

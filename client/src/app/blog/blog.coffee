@@ -2,10 +2,12 @@ angular.module('salsitasoft.blog', [
   'ui.state'
   'ngResource'
   'infinite-scroll'
+  'ngDisqus'
 ])
 
 .config ($stateProvider) ->
-  $stateProvider.state "postList",
+  $stateProvider.state "blog",
+    # The blog main page.
     url: "/posts"
     views:
       main:
@@ -13,6 +15,7 @@ angular.module('salsitasoft.blog', [
         templateUrl: 'blog/blog.html'
 
   $stateProvider.state "postDetail",
+    # Blog post detail.
     url: "/post/:postId"
     views:
       main:
@@ -20,36 +23,50 @@ angular.module('salsitasoft.blog', [
         templateUrl: 'blog/post.html'
 
 
-.factory 'Blog', ($resource) ->
-  return $resource "/api/posts/:id", {
-    id: '@id'
-  }, {
-    query:
-      method: 'GET'
-      isArray: no
-  }
-
-
-.controller 'BlogCtrl', ($scope, $state, Blog, Restangular) ->
+.controller 'BlogCtrl', ($scope, $state, Restangular) ->
 
   limit = 5
 
+  # Create resource endpoints.
   posts = Restangular.all 'posts'
+  categories = Restangular.all 'categories'
+  #tags = Restangular.all 'tags'
 
+  # Set up the model.
   $scope.posts = []
   $scope.metadata = {}
   $scope.busy = false
-  $scope.selectedTags = []
+  $scope.categories = categories.getList()
+  #$scope.tags = tags.getList()
 
+  # Throw away the old posts and load new ones.
+  resetPosts = ->
+    $scope.posts = []
+    $scope.metadata = []
+    $scope.loadMorePosts()
+
+  # Filter by year/month.
+  $scope.filterDate = (year = null, month = null) ->
+    $scope.filter.year = year
+    $scope.filter.month = month
+    resetPosts()
+
+  # Get data from the server.
   $scope.loadMorePosts = ->
+    # Check if there's any posts left.
     if $scope.metadata.total
       if $scope.posts.length >= $scope.metadata.total - limit
         return
 
     $scope.busy = true
-    tags = if $scope.selectedTags.length then [$scope.selectedTags] else ''
+
     qPosts = posts.getList {
-      from: $scope.posts.length, limit: limit, tags: tags
+      from: $scope.posts.length
+      limit: limit
+      year: $scope.filter.year
+      month: $scope.filter.month
+      tags: JSON.stringify($scope.filter.tags)
+      category: $scope.filter.category
     }
     qPosts.then (data) ->
       $scope.posts = $scope.posts.concat data
@@ -60,59 +77,96 @@ angular.module('salsitasoft.blog', [
     $state.transitionTo 'postDetail', {postId: slug}
 
   $scope.tagSelected = (tag) ->
-    $scope.selectedTags = [tag]
-    $scope.posts = []
-    $scope.metadata = {}
-    $scope.loadMorePosts()
+    $scope.filter.tags.push tag unless tag in $scope.filter.tags
+    resetPosts()
+
+  $scope.categorySelected = (category) ->
+    $scope.filter.category = category
+    resetPosts()
+
+  $scope.resetFilters = ->
+    $scope.filter =
+      tags: []
+      category: null
+      year: null
+      month: null
+    resetPosts()
+
+  # Set filters to stun...uh, sorry, to empty sate.
+  $scope.resetFilters()
 
 
-.controller 'PostCtrl', ($scope, Blog, $stateParams, $state, Restangular) ->
-
+.controller 'PostCtrl', ($scope, $stateParams, $state, Restangular, $disqus) ->
   post = Restangular.one 'posts', $stateParams.postId
+
+  # Required by Disqus.
+  $disqus.shortname('salsita')
 
   $scope.data = post.get()
 
   $scope.showAll = ->
-    $state.transitionTo 'postList'
+    $state.transitionTo 'blog'
 
 
+# Ensure the `read more` link rendered by the server in the post preview
+# actually does something (i.e. call function specified by `read-more`).
+#
+# Example:
+#
+#    <div class="preview"
+#         blog-post-preview="post.preview"
+#         read-more="postSelected(post.slug)">
+#
 .directive 'blogPostPreview', ($compile, $parse) ->
   restrict: 'EA'
   link: (scope, element, attrs) ->
-    previewHTML = $parse(attrs.previewContent)(scope)
+    previewHTML = $parse(attrs.blogPostPreview)(scope)
     $(element).append $compile(previewHTML)(scope)
 
     # Notify parent controller when user clicks the 'read more' link.
     $(element).find('a.read-more').on 'click', ->
       scope.$apply ->
-        $parse(attrs.onReadMoreClicked)(scope)
+        $parse(attrs.readMore)(scope)
 
-.directive 'postList', ->
+
+# Adds `active` class to the element in the vertical center of the viewport.
+.directive 'markCenterElement', ->
+
+  # add `markClass` CSS class to the element in viewport center.
+  markCentralElement = (element, itemSelector, markClass="active") ->
+    $(element).find(itemSelector).each ->
+      borders =
+        top: $(this).offset().top - $(document).scrollTop()
+        bottom: $(this).offset().top + $(this).outerHeight() -
+          $(document).scrollTop()
+      if borders.top <= ($(window).height() / 2) <= borders.bottom
+        $(this).addClass markClass
+      else
+        $(this).removeClass markClass
+
   restrict: 'A'
   link: (scope, element, attrs) ->
     timeout = null
 
+    # Change the marked element as the user scrolls (we're using timeout to go
+    # easy on the CPU).
     $(document).on 'scroll.blog', ->
       timeout = timeout or window.setTimeout ->
-        $(element).find('.post').each ->
-          borders =
-            top: $(this).offset().top - $(document).scrollTop()
-            bottom: $(this).offset().top + $(this).outerHeight() -
-              $(document).scrollTop()
-          center = $(window).height() / 2
-          if borders.top < center and borders.bottom > center
-            $(this).addClass 'active'
-            console.log 'active'
-          else
-            $(this).removeClass 'active'
         timeout = null
+        markCentralElement element, attrs.itemSelector, attrs.markCenterElement
       , 200
 
-    scope.$on '$destroy', ->
-      console.log 'destroying post list scope'
-      $(document).off 'scroll.blog'
+    scope.$watch attrs.items, (items) ->
+      if items?.length > 0
+        # Make sure central element is marked even if the user
+        # didn't scroll yet.
+        markCentralElement element, attrs.itemSelector, attrs.markCenterElement
+
+    # Clean up.
+    scope.$on '$destroy', -> $(document).off 'scroll.blog'
 
 
+# Converts month with 0-based index to its string value, e.g. 2 -> "February".
 .filter 'monthIndexToString', ($filter) ->
   (input) ->
     d = new Date()

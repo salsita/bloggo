@@ -11,7 +11,8 @@
     "moment": "~2.1.0",
     "nginfinitescroll": "~1.0.0",
     "jquery": ">= 1.9.0",
-    "restangular": "~1.0.10"
+    "restangular": "~1.0.10",
+    "angular-disqus": "~0.0.1"
   },
   "dependencies": {
     "angular-resource": "~1.0.7",
