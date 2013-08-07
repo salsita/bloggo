@@ -3,9 +3,10 @@
   .col-lg-4
     .left-menu
       .year(ng-repeat='(year, months) in metadata.stats')
-        a(ng-click='filterDate(year)') {{year}}
-        .month(ng-repeat='(month, post_count) in months track by $index')
-          a(ng-click='filterDate(year, month)') &nbsp;{{month | monthIndexToString}} ({{post_count}})
+        a(ng-click='filterDate(year)', ng-class='{active: activePost.date.getFullYear() == year}') {{year}}
+        .month(ng-repeat='(month, post_count) in months track by $index | orderBy:parseInt(month)')
+          a(ng-click='filterDate(year, month)', ng-class='{active: activePost.date.getFullYear() == year && activePost.date.getMonth() == month}')
+            | &nbsp;{{month | monthIndexToString}} ({{post_count}})
 
       h3 Selected Tags:
       ul.selected-tag
@@ -27,8 +28,8 @@
     hr
 
     .post-list-container(infinite-scroll="loadMorePosts()", infinite-scroll-disabled="busy", infinite-scroll-distance='1', infinite-scroll-immediate-check='true')
-      .post-list(mark-center-element="active", item-selector=".post", items="posts")
-        .post.well(ng-repeat='post in posts')
+      .post-list(mark-center-element="active", item-selector=".post")
+        .post.well(ng-repeat='post in posts', watch-class="active", on-class-added="postActivated(post)")
           h1.title
             a(ng-click='postSelected(post.slug)') {{post.title}}
 

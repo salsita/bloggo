@@ -37,6 +37,7 @@ angular.module('salsitasoft.blog', [
   $scope.metadata = {}
   $scope.busy = false
   $scope.categories = categories.getList()
+  $scope.activePost = null
   #$scope.tags = tags.getList()
 
   # Throw away the old posts and load new ones.
@@ -51,11 +52,15 @@ angular.module('salsitasoft.blog', [
     $scope.filter.month = month
     resetPosts()
 
+  $scope.orderByMonth = (month) ->
+    console.log month
+    parseInt(month)
+
   # Get data from the server.
   $scope.loadMorePosts = ->
     # Check if there's any posts left.
     if $scope.metadata.total
-      if $scope.posts.length >= $scope.metadata.total - limit
+      if $scope.posts.length >= $scope.metadata.total
         return
 
     $scope.busy = true
@@ -75,6 +80,11 @@ angular.module('salsitasoft.blog', [
 
   $scope.postSelected = (slug) ->
     $state.transitionTo 'postDetail', {postId: slug}
+
+  $scope.postActivated = (post) ->
+    post.date = new Date(post.date)
+    $scope.activePost = post
+    console.log 'active post', post
 
   $scope.tagSelected = (tag) ->
     $scope.filter.tags.push tag unless tag in $scope.filter.tags
@@ -153,17 +163,30 @@ angular.module('salsitasoft.blog', [
     $(document).on 'scroll.blog', ->
       timeout = timeout or window.setTimeout ->
         timeout = null
-        markCentralElement element, attrs.itemSelector, attrs.markCenterElement
+        scope.$apply ->
+          markCentralElement(
+            element, attrs.itemSelector, attrs.markCenterElement
+          )
       , 200
 
-    scope.$watch attrs.items, (items) ->
-      if items?.length > 0
+    scope.$watch (-> $(element).find(attrs.itemSelector).length), (len) ->
+      if len > 0
         # Make sure central element is marked even if the user
         # didn't scroll yet.
         markCentralElement element, attrs.itemSelector, attrs.markCenterElement
 
     # Clean up.
     scope.$on '$destroy', -> $(document).off 'scroll.blog'
+
+
+.directive 'watchClass', ($parse) ->
+  restrict: 'A'
+  link: (scope, element, attrs) ->
+    scope.$watch ->
+      $(element).hasClass attrs.watchClass
+    , (hasClass) ->
+      if hasClass
+        $parse(attrs.onClassAdded)(scope)
 
 
 # Converts month with 0-based index to its string value, e.g. 2 -> "February".

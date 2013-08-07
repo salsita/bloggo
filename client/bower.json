@@ -12,7 +12,8 @@
     "nginfinitescroll": "~1.0.0",
     "jquery": ">= 1.9.0",
     "restangular": "~1.0.10",
-    "angular-disqus": "~0.0.1"
+    "angular-disqus": "~0.0.1",
+    "placeholders": "https://raw.github.com/joshdmiller/ng-boilerplate/v0.3.0-release/vendor/placeholders/angular-placeholders-0.0.1-SNAPSHOT.min.js"
   },
   "dependencies": {
     "angular-resource": "~1.0.7",

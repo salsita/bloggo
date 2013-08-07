@@ -5,10 +5,22 @@
 
   .post {
     margin-bottom: 2em;
+    //color: #CCCCCC;
+    opacity: 0.2;
+    transition: .3s ease-in-out;
+    -webkit-transition: .3s ease-in-out;
+    -moz-transition: .3s ease-in-out;
+    -o-transition: .3s ease-in-out;
   }
 
-  .active {
-    color: red;
+  .post.active {
+    opacity: 1;
+    //color: red;
+    //color: #000000;
+    transition: .3s ease-in-out;
+    -webkit-transition: .3s ease-in-out;
+    -moz-transition: .3s ease-in-out;
+    -o-transition: .3s ease-in-out;
   }
 
   .post:nth-of-type(1) {
@@ -42,6 +54,9 @@ ul.categories {
 }
 
 .left-menu {
+
+  position: fixed;
+
   ul {
     list-style-type: none;
     display: inline;
@@ -49,5 +64,11 @@ ul.categories {
 
   .reset-filters {
     margin-top: 2em;
+  }
+
+  .year {
+    a.active {
+      font-weight: bold;
+    }
   }
 }
