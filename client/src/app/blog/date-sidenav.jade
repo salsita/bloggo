@@ -1,0 +1,12 @@
+.year(ng-repeat='(year, months) in metadata.stats')
+
+  a(ng-click='filterDate(year)',
+    ng-class='{active: activePost.date.getFullYear() == year}')
+      | {{year}}
+      
+  .month(ng-repeat='(month, post_count) in months | orderBy:parseInt(month)')
+
+    a(ng-click='filterDate(year, month)',
+      ng-class='{active: activePost.date.getFullYear() == year && activePost.date.getMonth() == month}')
+      | &nbsp;{{month | monthIndexToString}} ({{post_count}})
+
