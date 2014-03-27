@@ -10,8 +10,7 @@
     "type": "git",
     "url": "git@github.com:realyze/bloggo.git"
   },
-  "dependencies": {},
-  "devDependencies": {
+  "dependencies": {
     "grunt": "~0.4.1",
     "grunt-recess": "~0.3.0",
     "grunt-contrib-clean": "~0.4.1",
