@@ -11,7 +11,6 @@ exports.setup = (poet) ->
     if _.isEmpty(tags) and not category
       # No tag or category => load all posts.
       posts = poet.helpers.getPosts()
-      console.log('aaaa', posts.length)
 
     if tags.length > 0
       # Get only posts that contain all the requested tags.

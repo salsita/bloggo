@@ -41,10 +41,15 @@ module.exports = (grunt) ->
       jenkins:
         XUNIT_FILE: 'test-results-server.xml'
 
+  cwd = process.cwd()
+  process.chdir path.join(__dirname, '..')
+
   grunt.loadNpmTasks 'grunt-express-server'
   grunt.loadNpmTasks 'grunt-contrib-watch'
   grunt.loadNpmTasks 'grunt-mocha-test'
   grunt.loadNpmTasks 'grunt-env'
+
+  process.chdir cwd
 
   grunt.registerTask 'default', ['dev']
 
