@@ -19,7 +19,8 @@
     "winston": "0.7.2",
     "poet": "~1.0.0-rc4",
     "express-resource": "~1.0.0",
-    "grunt-cli": "0.1.13"
+    "grunt-cli": "0.1.13",
+    "grunt": "~0.4.4"
   },
   "devDependencies": {
     "grunt": "~0.4.4",
