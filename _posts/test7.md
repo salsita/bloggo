@@ -1,5 +1,5 @@
 ---
-title: "My Test Post"
+title: "C U later" 
 tags: ["blog", "test", "markdown"]
 date: "2-2-2012"
 ---

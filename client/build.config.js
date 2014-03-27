@@ -51,17 +51,16 @@ module.exports = {
    */
   vendor_files: {
     js: [
-      'vendor/jquery/jquery.js',
+      'vendor/jquery/dist/jquery.js',
       'vendor/angular/angular.js',
-      'vendor/angular/angular-resource.js',
-      'vendor/angular/angular-sanitize.js',
+      'vendor/angular-sanitize/angular-sanitize.js',
       'vendor/angular-bootstrap/ui-bootstrap-tpls.min.js',
       'vendor/placeholders/index.js',
       'vendor/angular-ui-router/release/angular-ui-router.js',
       'vendor/angular-ui-utils/modules/route/route.js',
       'vendor/underscore/underscore.js',
       'vendor/moment/moment.js',
-      'vendor/nginfinitescroll/build/ng-infinite-scroll.js',
+      'vendor/ngInfiniteScroll/ng-infinite-scroll.js',
       'vendor/restangular/dist/restangular.js',
       'vendor/angular-disqus/angular-disqus.js'
     ],

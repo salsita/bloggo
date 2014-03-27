@@ -1,9 +1,10 @@
 angular.module('salsitasoft.blog', [
-  'ui.state'
-  'ngResource'
+  'ui.router'
   'infinite-scroll'
   'ngDisqus'
+  'restangular'
 ])
+
 
 .config ($stateProvider) ->
   $stateProvider.state "blog",
@@ -23,9 +24,16 @@ angular.module('salsitasoft.blog', [
         templateUrl: 'blog/post.html'
 
 
+.config ($disqusProvider) ->
+  $disqusProvider.setShortname 'salsita'
+
+
 .controller 'BlogCtrl', ($scope, $state, Restangular) ->
 
   limit = 5
+
+  $scope.sortMonths = (items) ->
+    items
 
   # Create resource endpoints.
   posts = Restangular.all 'posts'
@@ -36,7 +44,8 @@ angular.module('salsitasoft.blog', [
   $scope.posts = []
   $scope.metadata = {}
   $scope.busy = false
-  $scope.categories = categories.getList()
+  categories.getList().then (_categories) ->
+    $scope.categories = _categories
   $scope.activePost = null
   #$scope.tags = tags.getList()
 
@@ -58,6 +67,7 @@ angular.module('salsitasoft.blog', [
 
   # Get data from the server.
   $scope.loadMorePosts = ->
+    console.log 'loadMorePosts', $scope.metadata.total, $scope.posts.length
     # Check if there's any posts left.
     if $scope.metadata.total
       if $scope.posts.length >= $scope.metadata.total
@@ -65,18 +75,20 @@ angular.module('salsitasoft.blog', [
 
     $scope.busy = true
 
-    qPosts = posts.getList {
+    posts.getList({
       from: $scope.posts.length
       limit: limit
       year: $scope.filter.year
       month: $scope.filter.month
       tags: JSON.stringify($scope.filter.tags)
       category: $scope.filter.category
-    }
-    qPosts.then (data) ->
+    }).then (data) ->
       $scope.posts = $scope.posts.concat data
       $scope.metadata = data.metadata
       $scope.busy = false
+
+  # Only try to load more posts every now and then to save CPU time.
+  $scope.loadMorePosts = _.debounce $scope.loadMorePosts, 250
 
   $scope.postSelected = (slug) ->
     $state.transitionTo 'postDetail', {postId: slug}
@@ -84,7 +96,6 @@ angular.module('salsitasoft.blog', [
   $scope.postActivated = (post) ->
     post.date = new Date(post.date)
     $scope.activePost = post
-    console.log 'active post', post
 
   $scope.tagSelected = (tag) ->
     $scope.filter.tags.push tag unless tag in $scope.filter.tags
@@ -106,13 +117,15 @@ angular.module('salsitasoft.blog', [
   $scope.resetFilters()
 
 
-.controller 'PostCtrl', ($scope, $stateParams, $state, Restangular, $disqus) ->
+.controller 'PostCtrl', ($scope, $stateParams, $state, Restangular, $sce) ->
+
   post = Restangular.one 'posts', $stateParams.postId
+  console.log('post', post.get())
 
-  # Required by Disqus.
-  $disqus.shortname('salsita')
-
-  $scope.data = post.get()
+  post.get().then (post) ->
+    console.log(post)
+    $scope.data = post
+    $scope.content = $sce.trustAsHtml(post.content)
 
   $scope.showAll = ->
     $state.transitionTo 'blog'

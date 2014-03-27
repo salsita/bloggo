@@ -1,17 +1,13 @@
 express = require 'express'
+config = require 'config'
 Poet = require 'poet'
 path = require 'path'
 
-
 module.exports = app = express()
-
-
-POSTS_DIR = path.join __dirname, '../_posts'
-
 
 # Configure Poet.
 poet = Poet app,
-  posts: POSTS_DIR
+  posts: config.server.posts_root
   metaFormat: 'yaml'
   # Set up the how the 'read more' link in posts will be expanded.
   readMoreLink: (post) -> """
@@ -35,16 +31,16 @@ poet
 
 app.resource 'posts', require('./routes/posts').setup poet
 
-app.resource 'tags', {
+app.resource 'tags',
   index: (req, res) ->
     res.json
       data:
         data: poet.helpers.getTags()
-}
+        meta: {}
 
-app.resource 'categories', {
+app.resource 'categories',
   index: (req, res) ->
     res.json
       data:
         data: poet.helpers.getCategories()
-}
+        meta: {}

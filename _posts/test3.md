@@ -1,5 +1,5 @@
 ---
-title: "My Test Post"
+title: "My Test Post yohoo"
 tags: ["blog", "test", "markdown"]
 date: "2-2-2013"
 ---

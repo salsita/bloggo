@@ -1,10 +1,10 @@
 ---
-title: "My Test Post"
+title: "My Test Post foobar"
 tags: ["blog", "test", "markdown"]
 date: "2-2-2013"
 ---
 
-# My special blog post
+#### My special blog post
 
 preview comes here...
 

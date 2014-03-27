@@ -1,7 +1,7 @@
 ---
-title: "My Test Post"
+title: "My Test Post foobar foofoo"
 tags: ["blog", "test", "markdown"]
-date: "2-2-2013"
+date: "3-4-2013"
 ---
 
 # My special blog post

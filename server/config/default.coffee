@@ -13,3 +13,4 @@ module.exports =
   server:
     static_root: path.join __dirname, '../../client/build'
     views_root: path.join __dirname, '../views'
+    posts_root: (process.env.POSTS_ROOT or path.join __dirname, '../../_posts')

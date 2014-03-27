@@ -1,13 +1,8 @@
-
 .row
-  .col-lg-4
+  .span4
     .left-menu
-      .year(ng-repeat='(year, months) in metadata.stats')
-        a(ng-click='filterDate(year)', ng-class='{active: activePost.date.getFullYear() == year}') {{year}}
-        .month(ng-repeat='(month, post_count) in months track by $index | orderBy:parseInt(month)')
-          a(ng-click='filterDate(year, month)', ng-class='{active: activePost.date.getFullYear() == year && activePost.date.getMonth() == month}')
-            | &nbsp;{{month | monthIndexToString}} ({{post_count}})
-
+      .date-sidenav(ng-include="'blog/date-sidenav.html'")
+      
       h3 Selected Tags:
       ul.selected-tag
         li(ng-repeat='tag in filter.tags') {{tag}}
@@ -20,14 +15,17 @@
       .reset-filters
         a.btn.btn-info(ng-click='resetFilters()') reset filters
 
-  .col-lg-8
+  .span8
     ul.categories.nav.nav-pills
       li.category(ng-repeat='category in categories', ng-click="categorySelected(category)", ng-class="{disabled: metadata.categories.indexOf(category) < 0, active: metadata.categories.indexOf(category) > -1}")
         a {{category}}
 
     hr
 
-    .post-list-container(infinite-scroll="loadMorePosts()", infinite-scroll-disabled="busy", infinite-scroll-distance='1', infinite-scroll-immediate-check='true')
+    .post-list-container(
+        infinite-scroll="loadMorePosts()",
+        infinite-scroll-disabled="busy",
+        infinite-scroll-distance='1')
       .post-list(mark-center-element="active", item-selector=".post")
         .post.well(ng-repeat='post in posts', watch-class="active", on-class-added="postActivated(post)")
           h1.title
