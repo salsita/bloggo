@@ -14,7 +14,7 @@ module.exports = function ( grunt ) {
   grunt.loadNpmTasks('grunt-conventional-changelog');
   grunt.loadNpmTasks('grunt-bump');
   grunt.loadNpmTasks('grunt-coffeelint');
-  grunt.loadNpmTasks('grunt-recess');
+  grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-ngmin');
   grunt.loadNpmTasks('grunt-html2js');
@@ -237,32 +237,29 @@ module.exports = function ( grunt ) {
     },
 
     /**
-     * `recess` handles our LESS compilation and uglification automatically.
+     * We can't use Recess, it's buggy!
+     *
+     * See https://github.com/twitter/recess/issues/22 for details.
+     *
+     * `less` handles our LESS compilation and uglification automatically.
      * Only our `main.less` file is included in compilation; all other files
      * must be imported from this file.
      */
-    recess: {
+    less: {
       build: {
-        src: [ '<%= app_files.less %>' ],
-        dest: '<%= build_dir %>/assets/<%= pkg.name %>.css',
-        options: {
-          compile: true,
-          compress: false,
-          noUnderscores: false,
-          noIDs: false,
-          zeroUnits: false
-        }
+        files: {
+          "<%= build_dir %>/assets/<%= pkg.name %>.css": "<%= app_files.less %>"
+        },
+        _dest: "<%= build_dir %>/assets/<%= pkg.name %>.css"
       },
       compile: {
-        src: [ '<%= recess.build.dest %>' ],
-        dest: '<%= recess.build.dest %>',
         options: {
-          compile: true,
-          compress: true,
-          noUnderscores: false,
-          noIDs: false,
-          zeroUnits: false
-        }
+            compress: true
+        },
+        files: {
+            "<%= build_dir %>/assets/<%= pkg.name %>.css": "<%= app_files.less %>"
+        },
+        _dest: '<%= less.build._dest %>'
       }
     },
 
@@ -405,7 +402,7 @@ module.exports = function ( grunt ) {
           '<%= html2js.jade_app.dest %>',
           '<%= html2js.jade_common.dest %>',
           '<%= vendor_files.css %>',
-          '<%= recess.build.dest %>'
+          '<%= less.build._dest %>'
         ]
       },
 
@@ -419,7 +416,7 @@ module.exports = function ( grunt ) {
         src: [
           '<%= concat.compile_js.dest %>',
           '<%= vendor_files.css %>',
-          '<%= recess.compile.dest %>'
+          '<%= less.compile._dest %>'
         ]
       }
     },
@@ -539,7 +536,7 @@ module.exports = function ( grunt ) {
        */
       less: {
         files: [ 'src/**/*.less' ],
-        tasks: [ 'recess:build' ]
+        tasks: [ 'less:build' ]
       },
 
       /**
@@ -582,20 +579,22 @@ module.exports = function ( grunt ) {
    * before watching for changes.
    */
   grunt.renameTask( 'watch', 'delta' );
-  grunt.registerTask( 'watch', [ 'build', 'karma:unit', 'delta' ] );
+  grunt.registerTask( 'watch', [ 'build', 'test', 'karma:unit', 'delta' ] );
 
   /**
    * The default task is to build and compile.
    */
   grunt.registerTask( 'default', [ 'build', 'compile' ] );
 
+  grunt.registerTask( 'test', ['build', 'karmaconfig', 'karma:continuous']);
+
   /**
    * The `build` task gets your app ready to run for development and testing.
    */
   grunt.registerTask( 'build', [
-    'clean', 'jshint', 'coffeelint', 'coffee', 'jade', 'html2js', 'recess:build',
+    'clean', 'jshint', 'coffeelint', 'coffee', 'jade', 'html2js', 'less:build',
     'copy:build_assets', 'copy:build_appjs', 'copy:build_vendorjs',
-    'index:build', 'karmaconfig', 'karma:continuous'
+    'index:build'
   ]);
 
   /**
@@ -603,7 +602,7 @@ module.exports = function ( grunt ) {
    * minifying your code.
    */
   grunt.registerTask( 'compile', [
-    'recess:compile', 'copy:compile_assets', 'ngmin', 'concat', 'uglify', 'index:compile'
+    'less:compile', 'copy:compile_assets', 'ngmin', 'concat', 'uglify', 'index:compile'
   ]);
 
   /**
