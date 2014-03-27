@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+set -e            # fail fast
+set -o pipefail   # don't ignore exit codes when piping output
+# set -x          # enable debugging
+
+status() {
+  echo "-----> $*"
+}
+
+indent() {
+  sed -u 's/^/       /'
+}
+
+# Directories
+BUILD_DIR=$1
+CACHE_DIR=$2
+ENV_DIR=$3
+PATH=${PATH}:${BUILD_DIR}/vendor/node/bin:${BUILD_DIR}/node_modules/.bin
+
+
+
+# Run subsequent commands from the build path
+cd ${BUILD_DIR}
+
+# Install dependencies
+status "Installing dependencies"
+cd client
+  npm prune 2>&1 | indent
+  npm install --production 2>&1 | indent
+  bower prune 2>&1 | indent
+  bower install --production 2>&1 | indent
+cd ..
+
+# Build project
+status "Building project"
+cd client
+  grunt build 2>&1 | indent
+  grunt compile 2>&1 | indent
+cd ..
