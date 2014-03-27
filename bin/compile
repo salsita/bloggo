@@ -22,6 +22,7 @@ PATH=${PATH}:${BUILD_DIR}/vendor/node/bin:${BUILD_DIR}/node_modules/.bin
 
 # Run subsequent commands from the build path
 cd ${BUILD_DIR}
+npm install --production
 
 # Install dependencies
 status "Installing dependencies"
